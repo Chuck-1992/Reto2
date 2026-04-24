@@ -1,4 +1,6 @@
 import os
+from decimal import Decimal, InvalidOperation, getcontext
+getcontext().prec = 80
 
 # ******************************************************************************************
 # Operaciones Aritméticas y Repetición de Cálculos
@@ -50,18 +52,27 @@ def imprimir_tabla(encabezados, filas):
 # Función para capturar el núimero ingresado por el usuario
 def leer_numero(mensaje):
     while True:
-        dato = input(mensaje).lower()
+        dato = input(mensaje).lower().strip()
 
         if dato == "salir":
             print("Programa finalizado. Gracias por usar el menú.")
             raise SystemExit
 
         try:
-            numero = float(dato)
+            numero = Decimal(dato)
             return numero
-        except ValueError:
+        except InvalidOperation:
             print("Error: debe ingresar un número válido.")
 
+
+# Función para formatear numeros decimales
+def formatear_numero(numero, decimales=2):
+    numero_formateado = f"{numero:,.{decimales}f}"
+
+    # Cambia formato inglés 1,234,567.89 a formato español 1.234.567,89
+    numero_formateado = numero_formateado.replace(",", "X").replace(".", ",").replace("X", ".")
+
+    return numero_formateado
 
 # Inicio del programa
 print("\nEscriba 'salir' en cualquier momento para cerrar el programa.")
@@ -120,7 +131,13 @@ try:
 
                 imprimir_tabla(
                     ["Número 1", "Operador", "Número 2", "Resultado", "Tipo de resultado"],
-                    [[f"{numero1:.2f}", signo, f"{numero2:.2f}", f"{resultado:.2f}", tipo_resultado]]
+                    [[
+                        formatear_numero(numero1),
+                        signo,
+                        formatear_numero(numero2),
+                        formatear_numero(resultado),
+                        tipo_resultado
+                    ]]
                 )
 
                 while True:
